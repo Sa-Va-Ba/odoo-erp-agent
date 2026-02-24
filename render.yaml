@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: odoo-erp-agent
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt && pip install -e .
+    startCommand: gunicorn web_interview:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
