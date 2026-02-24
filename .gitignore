@@ -1,0 +1,15 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+outputs/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.DS_Store
+*.log
+venv/
+.venv/
+node_modules/
+odoo-instance/

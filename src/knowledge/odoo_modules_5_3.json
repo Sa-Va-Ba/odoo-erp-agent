@@ -1,0 +1,183 @@
+[
+  {
+    "technical_name": "base",
+    "name": "Base",
+    "domain": "core",
+    "description": "Core OpenERP framework (legacy 5.3).",
+    "dependencies": [],
+    "tags": ["core"],
+    "requires_enterprise": false,
+    "supported_versions": ["5.3"],
+    "community_alternatives": [],
+    "configuration_steps": [],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "sale_management",
+    "name": "Sales",
+    "domain": "sales",
+    "description": "Sales orders and quotations for OpenERP 5.3 deployments.",
+    "dependencies": [],
+    "tags": ["sales", "quotes", "orders"],
+    "requires_enterprise": false,
+    "supported_versions": ["5.3"],
+    "community_alternatives": [],
+    "configuration_steps": [
+      "Configure sales teams and quotation sequences",
+      "Set payment terms and order workflows"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "crm",
+    "name": "CRM",
+    "domain": "sales",
+    "description": "Lead and opportunity tracking in OpenERP 5.3.",
+    "dependencies": [],
+    "tags": ["crm", "leads", "opportunities"],
+    "requires_enterprise": false,
+    "supported_versions": ["5.3"],
+    "community_alternatives": [],
+    "configuration_steps": [
+      "Configure lead stages and assignment rules"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "stock",
+    "name": "Inventory",
+    "domain": "inventory",
+    "description": "Stock and warehouse operations for legacy deployments.",
+    "dependencies": [],
+    "tags": ["inventory", "warehouse", "stock"],
+    "requires_enterprise": false,
+    "supported_versions": ["5.3"],
+    "community_alternatives": [],
+    "configuration_steps": [
+      "Define warehouses, locations, and stock moves"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "purchase",
+    "name": "Purchase",
+    "domain": "purchase",
+    "description": "Purchase orders and vendor management.",
+    "dependencies": ["stock"],
+    "tags": ["purchase", "procurement", "suppliers"],
+    "requires_enterprise": false,
+    "supported_versions": ["5.3"],
+    "community_alternatives": [],
+    "configuration_steps": [
+      "Configure supplier records and procurement workflow"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "delivery",
+    "name": "Delivery",
+    "domain": "inventory",
+    "description": "Carrier shipment workflow for stock dispatch.",
+    "dependencies": ["stock"],
+    "tags": ["shipping", "carrier", "delivery"],
+    "requires_enterprise": false,
+    "supported_versions": ["5.3"],
+    "community_alternatives": [],
+    "configuration_steps": [
+      "Set carrier services and shipping methods"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "account",
+    "name": "Accounting",
+    "domain": "accounting",
+    "description": "General ledger, invoicing, and taxes.",
+    "dependencies": [],
+    "tags": ["accounting", "invoice", "finance"],
+    "requires_enterprise": false,
+    "supported_versions": ["5.3"],
+    "community_alternatives": [],
+    "configuration_steps": [
+      "Configure chart of accounts and tax mappings"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "mrp",
+    "name": "Manufacturing",
+    "domain": "manufacturing",
+    "description": "Manufacturing orders and bill of materials.",
+    "dependencies": ["stock"],
+    "tags": ["manufacturing", "production", "bom"],
+    "requires_enterprise": false,
+    "supported_versions": ["5.3"],
+    "community_alternatives": [],
+    "configuration_steps": [
+      "Define BOMs and production routes"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "hr",
+    "name": "Employees",
+    "domain": "hr",
+    "description": "Employee records and organization structure.",
+    "dependencies": [],
+    "tags": ["hr", "employee"],
+    "requires_enterprise": false,
+    "supported_versions": ["5.3"],
+    "community_alternatives": [],
+    "configuration_steps": [
+      "Set departments and employee roles"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "project",
+    "name": "Project",
+    "domain": "project",
+    "description": "Project and task tracking.",
+    "dependencies": [],
+    "tags": ["project", "delivery"],
+    "requires_enterprise": false,
+    "supported_versions": ["5.3"],
+    "community_alternatives": [],
+    "configuration_steps": [
+      "Create project templates and task stages"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "hr_timesheet",
+    "name": "Timesheets",
+    "domain": "project",
+    "description": "Timesheet logging and approval.",
+    "dependencies": ["project", "hr"],
+    "tags": ["timesheet", "hours"],
+    "requires_enterprise": false,
+    "supported_versions": ["5.3"],
+    "community_alternatives": [],
+    "configuration_steps": [
+      "Set timesheet units and approval flow"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "webshop_connector",
+    "name": "Webshop Connector",
+    "domain": "ecommerce",
+    "description": "Custom connector blueprint for external webshop integrations in OpenERP 5.3.",
+    "dependencies": ["sale_management", "stock", "delivery", "account"],
+    "tags": ["ecommerce", "integration", "online_store"],
+    "requires_enterprise": false,
+    "supported_versions": ["5.3"],
+    "community_alternatives": [],
+    "configuration_steps": [
+      "Define external webshop API endpoints",
+      "Map products, prices, stock, and order states",
+      "Configure scheduled sync jobs"
+    ],
+    "conflicts_with": []
+  }
+]

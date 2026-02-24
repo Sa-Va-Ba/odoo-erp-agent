@@ -1,0 +1,84 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "odoo-erp-agent"
+version = "0.1.0"
+description = "AI-powered multi-agent system for automating Odoo ERP implementations"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Sam Van Bael"}
+]
+keywords = ["odoo", "erp", "ai", "agent", "implementation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "requests>=2.28.0",  # For HTTP requests to LLM APIs
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "ruff>=0.1.0",
+]
+groq = [
+    "groq>=0.4.0",  # Groq SDK (optional, can use HTTP fallback)
+]
+voice = [
+    "faster-whisper>=1.0.0",  # Speech-to-text
+    "pyttsx3>=2.90",          # Text-to-speech (offline fallback)
+    "pydub>=0.25.1",          # Audio playback for ElevenLabs
+    "sounddevice>=0.4.6",     # Audio recording
+    "numpy>=1.24.0",          # Audio processing
+]
+all-llm = [
+    "groq>=0.4.0",
+    "anthropic>=0.18.0",
+    "openai>=1.0.0",
+]
+all = [
+    "groq>=0.4.0",
+    "faster-whisper>=1.0.0",
+    "pyttsx3>=2.90",
+    "pydub>=0.25.1",
+    "sounddevice>=0.4.6",
+    "numpy>=1.24.0",
+]
+
+[project.scripts]
+odoo-interview = "src.cli:main"
+odoo-voice-interview = "src.voice_cli:main"
+odoo-adaptive-interview = "src.adaptive_cli:main"
+odoo-swarm-plan = "src.swarm.cli:main"
+odoo-swarm-qa = "src.swarm.qa:main"
+odoo-swarm-apply = "src.swarm.apply:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310', 'py311', 'py312']
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I", "N", "W"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

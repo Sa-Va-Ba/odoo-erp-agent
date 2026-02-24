@@ -1,0 +1,433 @@
+[
+  {
+    "technical_name": "base",
+    "name": "Base",
+    "domain": "core",
+    "description": "Core Odoo framework",
+    "dependencies": [],
+    "tags": ["core"],
+    "requires_enterprise": false,
+    "configuration_steps": [],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "sale_management",
+    "name": "Sales",
+    "domain": "sales",
+    "description": "Quotations, sales orders, and invoicing workflow",
+    "dependencies": [],
+    "tags": ["sales", "quotes", "orders"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Define product catalog and price lists",
+      "Configure sales teams and pipelines",
+      "Set quotation and order templates"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "crm",
+    "name": "CRM",
+    "domain": "sales",
+    "description": "Lead and opportunity management",
+    "dependencies": [],
+    "tags": ["crm", "leads", "opportunities"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Configure lead sources and stages",
+      "Set up sales teams and activity types"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "sale_subscription",
+    "name": "Subscriptions",
+    "domain": "sales",
+    "description": "Recurring subscriptions and renewals",
+    "dependencies": ["sale_management"],
+    "tags": ["subscription", "recurring"],
+    "requires_enterprise": true,
+    "community_alternatives": ["sale_management"],
+    "configuration_steps": [
+      "Define subscription templates and renewal rules",
+      "Configure automatic invoicing schedule"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "stock",
+    "name": "Inventory",
+    "domain": "inventory",
+    "description": "Warehouse and stock operations",
+    "dependencies": [],
+    "tags": ["inventory", "warehouse", "stock"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Configure warehouses and locations",
+      "Define product routes and reordering rules"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "purchase",
+    "name": "Purchase",
+    "domain": "purchase",
+    "description": "Purchasing and vendor management",
+    "dependencies": ["stock"],
+    "tags": ["purchase", "procurement", "suppliers"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Set vendor price lists",
+      "Configure purchase approval rules"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "delivery",
+    "name": "Delivery",
+    "domain": "inventory",
+    "description": "Carrier integrations and shipping rates",
+    "dependencies": ["stock"],
+    "tags": ["shipping", "carrier", "delivery"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Configure shipping carriers",
+      "Set delivery pricing rules"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "account",
+    "name": "Accounting",
+    "domain": "accounting",
+    "description": "Core accounting, invoicing, and payments",
+    "dependencies": [],
+    "tags": ["accounting", "invoice", "finance"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Configure chart of accounts",
+      "Set fiscal positions and tax rules"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "account_accountant",
+    "name": "Accounting (Enterprise)",
+    "domain": "accounting",
+    "description": "Advanced accounting features and reporting",
+    "dependencies": ["account"],
+    "tags": ["accounting", "reporting"],
+    "requires_enterprise": true,
+    "community_alternatives": ["account"],
+    "configuration_steps": [
+      "Enable advanced accounting reports",
+      "Configure analytic accounts"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "mrp",
+    "name": "Manufacturing",
+    "domain": "manufacturing",
+    "description": "Manufacturing orders and bills of materials",
+    "dependencies": ["stock"],
+    "tags": ["manufacturing", "production", "bom"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Configure bills of materials",
+      "Define work centers and operations"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "quality",
+    "name": "Quality",
+    "domain": "manufacturing",
+    "description": "Quality checks and inspections",
+    "dependencies": ["mrp"],
+    "tags": ["quality", "inspection"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Define quality control points",
+      "Set inspection triggers"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "maintenance",
+    "name": "Maintenance",
+    "domain": "manufacturing",
+    "description": "Equipment maintenance management",
+    "dependencies": [],
+    "tags": ["maintenance", "equipment"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Register equipment and maintenance teams",
+      "Define preventive maintenance schedules"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "project",
+    "name": "Project",
+    "domain": "project",
+    "description": "Project management and task tracking",
+    "dependencies": [],
+    "tags": ["project", "delivery"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Define project templates",
+      "Set task stages and roles"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "hr_timesheet",
+    "name": "Timesheets",
+    "domain": "project",
+    "description": "Timesheet entry and approvals",
+    "dependencies": ["project"],
+    "tags": ["timesheet", "hours"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Define timesheet policies",
+      "Configure approvals and billing rules"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "helpdesk",
+    "name": "Helpdesk",
+    "domain": "service",
+    "description": "Customer support ticketing",
+    "dependencies": [],
+    "tags": ["support", "ticket"],
+    "requires_enterprise": true,
+    "community_alternatives": ["project"],
+    "configuration_steps": [
+      "Configure helpdesk teams",
+      "Define SLAs and ticket stages"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "hr",
+    "name": "Employees",
+    "domain": "hr",
+    "description": "Employee records and HR directory",
+    "dependencies": [],
+    "tags": ["hr", "employee"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Define departments and job positions"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "hr_payroll",
+    "name": "Payroll",
+    "domain": "hr",
+    "description": "Payroll processing",
+    "dependencies": ["hr"],
+    "tags": ["payroll"],
+    "requires_enterprise": true,
+    "community_alternatives": ["hr"],
+    "configuration_steps": [
+      "Configure salary rules",
+      "Set payroll structure and schedules"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "website",
+    "name": "Website",
+    "domain": "website",
+    "description": "Website builder and CMS",
+    "dependencies": [],
+    "tags": ["website", "cms"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Configure website theme and pages",
+      "Set domain and SEO settings"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "website_sale",
+    "name": "eCommerce",
+    "domain": "ecommerce",
+    "description": "Online store and checkout",
+    "dependencies": ["website", "sale_management", "payment"],
+    "tags": ["ecommerce", "online_store"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Set product categories and pricing",
+      "Configure payment methods and delivery"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "payment",
+    "name": "Payments",
+    "domain": "ecommerce",
+    "description": "Payment providers and checkout",
+    "dependencies": [],
+    "tags": ["payment", "checkout"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Enable payment providers",
+      "Set payment flow and currencies"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "marketing_automation",
+    "name": "Marketing Automation",
+    "domain": "marketing",
+    "description": "Automated marketing campaigns",
+    "dependencies": [],
+    "tags": ["marketing", "campaign"],
+    "requires_enterprise": true,
+    "community_alternatives": ["crm"],
+    "configuration_steps": [
+      "Define campaign segments",
+      "Configure automated flows"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "point_of_sale",
+    "name": "Point of Sale",
+    "domain": "sales",
+    "description": "Retail point of sale system",
+    "dependencies": ["stock", "account"],
+    "tags": ["pos", "retail", "shop"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Configure POS sessions and payment methods",
+      "Set up product categories for POS",
+      "Configure receipt templates"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "hr_recruitment",
+    "name": "Recruitment",
+    "domain": "hr",
+    "description": "Applicant tracking and recruitment",
+    "dependencies": ["hr"],
+    "tags": ["recruitment", "hiring", "applicant"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Define job positions and departments",
+      "Configure recruitment stages",
+      "Set up job board integrations"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "hr_expense",
+    "name": "Expenses",
+    "domain": "hr",
+    "description": "Employee expense management",
+    "dependencies": ["hr", "account"],
+    "tags": ["expense", "reimbursement"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Define expense categories",
+      "Configure approval workflows",
+      "Set expense policies"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "hr_holidays",
+    "name": "Time Off",
+    "domain": "hr",
+    "description": "Leave management and time off requests",
+    "dependencies": ["hr"],
+    "tags": ["leave", "vacation", "time_off"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Define leave types and allocations",
+      "Configure approval workflows",
+      "Set public holidays"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "hr_attendance",
+    "name": "Attendances",
+    "domain": "hr",
+    "description": "Employee attendance tracking",
+    "dependencies": ["hr"],
+    "tags": ["attendance", "clock", "time"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Configure check-in/check-out methods",
+      "Set overtime rules",
+      "Define attendance policies"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "fleet",
+    "name": "Fleet",
+    "domain": "hr",
+    "description": "Vehicle fleet management",
+    "dependencies": ["hr"],
+    "tags": ["fleet", "vehicle", "car"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Register company vehicles",
+      "Assign vehicles to employees",
+      "Configure maintenance schedules"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "contacts",
+    "name": "Contacts",
+    "domain": "core",
+    "description": "Contact and partner management",
+    "dependencies": ["base"],
+    "tags": ["contacts", "partners", "customers"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Import existing contacts",
+      "Configure contact categories",
+      "Set up address formats"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "calendar",
+    "name": "Calendar",
+    "domain": "productivity",
+    "description": "Shared calendars and scheduling",
+    "dependencies": [],
+    "tags": ["calendar", "meetings", "schedule"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Configure calendar sharing",
+      "Set up meeting rooms",
+      "Enable calendar sync"
+    ],
+    "conflicts_with": []
+  },
+  {
+    "technical_name": "mail",
+    "name": "Discuss",
+    "domain": "productivity",
+    "description": "Internal messaging and discussions",
+    "dependencies": [],
+    "tags": ["messaging", "chat", "communication"],
+    "requires_enterprise": false,
+    "configuration_steps": [
+      "Configure email servers",
+      "Set up channels",
+      "Enable notifications"
+    ],
+    "conflicts_with": []
+  }
+]

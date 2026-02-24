@@ -1,0 +1,453 @@
+{
+  "_description": "Odoo module configuration requirements - dynamically loaded by the adaptive interview agent",
+  "_version": "1.0",
+  "_note": "Add new modules or update questions here without changing code",
+
+  "sale_management": {
+    "name": "Sales",
+    "description": "Quotations, sales orders, and invoicing workflow",
+    "setup_areas": [
+      {
+        "area": "product_types",
+        "questions": [
+          "What types of products do you sell? (Physical goods that ship, services delivered, digital products, subscriptions?)",
+          "For each product type, when should the customer be invoiced? (When order is confirmed, when product ships, or based on time/milestones?)"
+        ],
+        "config_fields": ["product.product.type", "product.product.invoice_policy"],
+        "context": "Determines product type and invoicing policy - critical for order-to-cash flow"
+      },
+      {
+        "area": "pricing",
+        "questions": [
+          "Do different customers pay different prices? (Retail vs wholesale, VIP customers, regional pricing?)",
+          "How do discounts work? (Percentage off, fixed amount, quantity-based tiers, promotional codes?)",
+          "Do prices change based on order quantity?"
+        ],
+        "config_fields": ["product.pricelist", "sale.order.line.discount", "product.pricelist.item"],
+        "context": "Configures pricelists, discounts, and pricing tiers"
+      },
+      {
+        "area": "quotation_workflow",
+        "questions": [
+          "Do sales quotes need manager approval before sending to customers? If so, at what discount or order value?",
+          "How long should quotes be valid by default?",
+          "Do customers need to sign quotes electronically before they become orders?"
+        ],
+        "config_fields": ["sale.order.validity_date", "sale.order.signature", "sale.order.approval"],
+        "context": "Configures quotation templates, validity, e-signature, and approval workflows"
+      },
+      {
+        "area": "sales_teams",
+        "questions": [
+          "How is sales organized? By region, by product type, by customer segment, or individual salespeople?",
+          "Do salespeople have targets or quotas? Monthly, quarterly, annually?",
+          "How should new leads/customers be assigned to salespeople?"
+        ],
+        "config_fields": ["crm.team", "sale.order.team_id", "crm.team.member"],
+        "context": "Configures sales team structure, targets, and assignment rules"
+      }
+    ]
+  },
+
+  "crm": {
+    "name": "CRM - Customer Relationship Management",
+    "description": "Lead and opportunity tracking, sales pipeline management",
+    "setup_areas": [
+      {
+        "area": "pipeline_stages",
+        "questions": [
+          "What stages does a potential deal go through? (e.g., New Lead → Qualified → Proposal Sent → Negotiation → Won/Lost)",
+          "At which stages do deals commonly get stuck? What should happen then?",
+          "Do certain stages require completing specific tasks before moving forward? (e.g., must have budget confirmed before sending proposal)"
+        ],
+        "config_fields": ["crm.stage", "crm.lead.stage_id", "crm.stage.requirements"],
+        "context": "Configures CRM pipeline stages, flow, and stage requirements"
+      },
+      {
+        "area": "lead_sources",
+        "questions": [
+          "Where do your leads come from? (Website forms, phone calls, referrals, trade shows, advertising?)",
+          "Do you need to track which marketing campaigns or ads generate leads?",
+          "Should leads from different sources go to different salespeople?"
+        ],
+        "config_fields": ["utm.source", "utm.campaign", "crm.lead.source_id"],
+        "context": "Configures lead source tracking and marketing attribution"
+      },
+      {
+        "area": "lead_qualification",
+        "questions": [
+          "How do you determine if a lead is worth pursuing? What makes a lead 'hot' vs 'cold'?",
+          "What information must be captured before a lead can move to opportunity stage?",
+          "Should the system automatically score or prioritize leads based on criteria?"
+        ],
+        "config_fields": ["crm.lead.priority", "crm.lead.stage_id", "crm.lead.scoring"],
+        "context": "Configures lead qualification criteria and scoring"
+      },
+      {
+        "area": "activities",
+        "questions": [
+          "What follow-up activities do salespeople typically do? (Calls, emails, meetings, demos?)",
+          "Should the system prompt salespeople when activities are overdue?",
+          "Do you want to track activity metrics (calls made, emails sent, etc.)?"
+        ],
+        "config_fields": ["mail.activity.type", "mail.activity.schedule"],
+        "context": "Configures activity types and reminders"
+      }
+    ]
+  },
+
+  "stock": {
+    "name": "Inventory Management",
+    "description": "Warehouse operations, stock tracking, shipping",
+    "setup_areas": [
+      {
+        "area": "warehouse_structure",
+        "questions": [
+          "How many warehouses or storage locations do you have?",
+          "Within each warehouse, do you need to track specific zones, racks, shelves, or bins?",
+          "Do different warehouses serve different purposes? (e.g., main warehouse vs returns warehouse vs quality hold)"
+        ],
+        "config_fields": ["stock.warehouse", "stock.location", "stock.location.route"],
+        "context": "Configures warehouse hierarchy and storage locations"
+      },
+      {
+        "area": "product_tracking",
+        "questions": [
+          "Do any products need unique serial numbers tracked? (e.g., electronics with serial numbers)",
+          "Do any products need batch/lot tracking? (e.g., food with production batches)",
+          "Do you have products with expiration dates that need tracking?",
+          "Do you need to trace where products came from (for recalls)?"
+        ],
+        "config_fields": ["product.template.tracking", "stock.lot", "stock.move.line.lot_id"],
+        "context": "Configures product traceability - serial, lot, and expiry tracking"
+      },
+      {
+        "area": "routes_replenishment",
+        "questions": [
+          "For stocked products: at what inventory level should you reorder? Who decides?",
+          "Do you make products to order (only when customer orders) or keep them in stock?",
+          "Do any products get shipped directly from your supplier to the customer (dropship)?",
+          "Should the system automatically create purchase orders when stock is low?"
+        ],
+        "config_fields": ["stock.route", "stock.warehouse.orderpoint", "product.template.route_ids"],
+        "context": "Configures inventory routes (MTS/MTO/dropship) and reordering rules"
+      },
+      {
+        "area": "warehouse_operations",
+        "questions": [
+          "How does picking work? One order at a time, or batch multiple orders together?",
+          "Is packing done at a separate station or combined with picking?",
+          "Do you use barcode scanners in the warehouse?",
+          "Do you need to weigh packages before shipping?"
+        ],
+        "config_fields": ["stock.picking.type", "stock.picking.batch", "barcode.configuration"],
+        "context": "Configures warehouse operations - picking, packing, shipping"
+      },
+      {
+        "area": "shipping",
+        "questions": [
+          "Which shipping carriers do you use? (UPS, FedEx, DHL, local carriers?)",
+          "Do you need to print shipping labels automatically?",
+          "How are shipping costs calculated? (Flat rate, by weight, carrier rates?)",
+          "Do customers choose shipping speed at checkout?"
+        ],
+        "config_fields": ["delivery.carrier", "stock.picking.shipping_weight", "delivery.price.rule"],
+        "context": "Configures shipping carriers and delivery methods"
+      }
+    ]
+  },
+
+  "account": {
+    "name": "Accounting",
+    "description": "General ledger, invoicing, payments, financial reporting",
+    "setup_areas": [
+      {
+        "area": "localization",
+        "questions": [
+          "In which country do you file your primary tax returns?",
+          "Do you need accounting compliance for multiple countries?",
+          "What accounting standards do you follow? (Local GAAP, IFRS, US GAAP?)",
+          "Do invoices need specific legal formats or fields for your country?"
+        ],
+        "config_fields": ["res.company.country_id", "account.chart.template", "account.fiscal.position"],
+        "context": "Selects localization package - determines chart of accounts, tax rules, and legal compliance"
+      },
+      {
+        "area": "chart_of_accounts",
+        "questions": [
+          "Do you have an existing chart of accounts you want to replicate, or start fresh?",
+          "How detailed should revenue tracking be? (One account vs by product category vs by product?)",
+          "Do you need to track profit/loss separately by business unit, department, or project?",
+          "Do you use cost centers for expense allocation?"
+        ],
+        "config_fields": ["account.account", "account.analytic.account", "account.analytic.plan"],
+        "context": "Configures chart of accounts and analytic accounting dimensions"
+      },
+      {
+        "area": "taxes",
+        "questions": [
+          "What sales tax/VAT rates do you charge? (List all rates you use)",
+          "Do tax rates vary by product type? (e.g., food at lower rate, services at standard rate)",
+          "Do tax rates vary by customer location? (Cross-border sales, different states?)",
+          "Do you have tax-exempt customers or products?"
+        ],
+        "config_fields": ["account.tax", "account.fiscal.position", "account.fiscal.position.tax"],
+        "context": "Configures tax rates and fiscal positions for different scenarios"
+      },
+      {
+        "area": "payment_terms",
+        "questions": [
+          "What are your standard payment terms for customers? (Due on receipt, Net 15, Net 30, etc.)",
+          "Do you offer early payment discounts? (e.g., 2% if paid within 10 days)",
+          "Do different customer types have different payment terms?",
+          "What payment terms do your vendors give you?"
+        ],
+        "config_fields": ["account.payment.term", "account.payment.term.line"],
+        "context": "Configures payment terms for customers and vendors"
+      },
+      {
+        "area": "bank_reconciliation",
+        "questions": [
+          "Which banks do you use for business accounts?",
+          "How do you currently import bank statements? (Download files, bank API, manual entry?)",
+          "Do you want automatic matching of payments to invoices?",
+          "Do you handle petty cash or need cash journal tracking?"
+        ],
+        "config_fields": ["res.partner.bank", "account.journal", "account.bank.statement"],
+        "context": "Configures bank accounts, journals, and reconciliation settings"
+      },
+      {
+        "area": "invoicing",
+        "questions": [
+          "Should invoices be sent automatically when orders are confirmed or shipped?",
+          "Do you need to customize invoice templates with your branding?",
+          "Do you send invoices by email, print and mail, or both?",
+          "Do you need recurring/subscription invoicing?"
+        ],
+        "config_fields": ["account.move.auto_post", "report.template", "account.move.send_method"],
+        "context": "Configures invoice automation and delivery"
+      }
+    ]
+  },
+
+  "purchase": {
+    "name": "Purchase Management",
+    "description": "Vendor management, purchase orders, receiving",
+    "setup_areas": [
+      {
+        "area": "vendors",
+        "questions": [
+          "How many vendors do you regularly purchase from?",
+          "Do you have negotiated pricing agreements or contracts with key vendors?",
+          "Do you need to track multiple vendors per product with different prices/lead times?",
+          "Do you evaluate vendor performance (delivery timeliness, quality)?"
+        ],
+        "config_fields": ["res.partner.supplier_rank", "product.supplierinfo", "vendor.evaluation"],
+        "context": "Configures vendor relationships and pricing"
+      },
+      {
+        "area": "purchase_workflow",
+        "questions": [
+          "Who can create purchase orders? Does anyone need to approve them?",
+          "At what dollar amount do purchases need approval? By whom?",
+          "Do you have purchase agreements or blanket orders with vendors?",
+          "Should the system automatically create POs when inventory is low?"
+        ],
+        "config_fields": ["purchase.order.approval", "purchase.requisition", "stock.warehouse.orderpoint"],
+        "context": "Configures purchase approval workflows and automation"
+      },
+      {
+        "area": "receiving",
+        "questions": [
+          "Do you inspect received goods before accepting them?",
+          "How do you handle partial deliveries from vendors?",
+          "Do you receive items at a specific location before putting them away?",
+          "Do you track landed costs (shipping, customs) as part of product cost?"
+        ],
+        "config_fields": ["stock.picking", "quality.check", "stock.landed.cost"],
+        "context": "Configures receiving process and cost tracking"
+      }
+    ]
+  },
+
+  "mrp": {
+    "name": "Manufacturing (MRP)",
+    "description": "Bills of materials, manufacturing orders, work centers",
+    "setup_areas": [
+      {
+        "area": "bills_of_materials",
+        "questions": [
+          "Describe a typical product's bill of materials - how many components/levels deep?",
+          "Do you have products with variants (sizes, colors) that share similar BOMs?",
+          "Do you need to track co-products or by-products from manufacturing?",
+          "Can the same product be made different ways (alternate BOMs)?"
+        ],
+        "config_fields": ["mrp.bom", "mrp.bom.line", "mrp.bom.byproduct"],
+        "context": "Configures bill of materials structure and variants"
+      },
+      {
+        "area": "work_centers",
+        "questions": [
+          "What machines, workstations, or work areas are used in production?",
+          "Do you need to track capacity and availability per work center?",
+          "Do different products require different sequences of work centers?",
+          "Do you track machine efficiency or utilization?"
+        ],
+        "config_fields": ["mrp.workcenter", "mrp.workcenter.capacity", "mrp.workcenter.productivity"],
+        "context": "Configures work centers and capacity planning"
+      },
+      {
+        "area": "manufacturing_orders",
+        "questions": [
+          "How are manufacturing orders created? Manually, from sales orders, or automatically when stock is low?",
+          "Do manufacturing steps have specific operations that workers follow?",
+          "Do workers need detailed work instructions at their stations?",
+          "Do you track actual time vs planned time for operations?"
+        ],
+        "config_fields": ["mrp.production", "mrp.routing", "mrp.workorder"],
+        "context": "Configures manufacturing order workflow and routing"
+      },
+      {
+        "area": "quality_control",
+        "questions": [
+          "Do you do quality inspections during or after manufacturing?",
+          "What quality checks are performed? (Measurements, visual, testing?)",
+          "What happens when a product fails quality inspection?",
+          "Do you need to track quality metrics over time?"
+        ],
+        "config_fields": ["quality.check", "quality.point", "quality.alert"],
+        "context": "Configures quality control checkpoints"
+      }
+    ]
+  },
+
+  "hr": {
+    "name": "Human Resources",
+    "description": "Employee management, attendance, leave",
+    "setup_areas": [
+      {
+        "area": "organization",
+        "questions": [
+          "What departments exist in your company?",
+          "What job positions/titles do you have?",
+          "Do you need to track reporting relationships (org chart)?",
+          "Do you have multiple office locations with employees?"
+        ],
+        "config_fields": ["hr.department", "hr.job", "hr.employee.parent_id"],
+        "context": "Configures organizational structure"
+      },
+      {
+        "area": "employee_info",
+        "questions": [
+          "What employee information do you need to track? (Personal info, emergency contacts, skills?)",
+          "Do employees have company equipment assigned to them?",
+          "Do you need to store employee documents? (Contracts, certifications?)"
+        ],
+        "config_fields": ["hr.employee", "hr.employee.skill", "hr.employee.document"],
+        "context": "Configures employee record fields"
+      },
+      {
+        "area": "attendance",
+        "questions": [
+          "How do employees record their working hours? (Clock in/out, honor system, timesheets?)",
+          "Do you have fixed schedules or flexible working hours?",
+          "Do you need to track overtime? What are the overtime rules?",
+          "Do employees work different shifts?"
+        ],
+        "config_fields": ["hr.attendance", "resource.calendar", "hr.attendance.overtime"],
+        "context": "Configures attendance tracking and work schedules"
+      },
+      {
+        "area": "time_off",
+        "questions": [
+          "What types of leave do employees get? (Vacation, sick, personal, parental?)",
+          "How are leave balances calculated? (Annual allocation, accrual?)",
+          "What is the approval process for leave requests?",
+          "Can employees carry over unused leave to next year?"
+        ],
+        "config_fields": ["hr.leave.type", "hr.leave.allocation", "hr.leave.approval"],
+        "context": "Configures leave types and policies"
+      }
+    ]
+  },
+
+  "project": {
+    "name": "Project Management",
+    "description": "Projects, tasks, timesheets",
+    "setup_areas": [
+      {
+        "area": "project_structure",
+        "questions": [
+          "What types of projects do you manage? (Client projects, internal, R&D?)",
+          "How do you organize work within projects? (Phases, milestones, tasks, subtasks?)",
+          "Do projects have budgets or spending limits?",
+          "Do you need project templates for common project types?"
+        ],
+        "config_fields": ["project.project", "project.task.type", "project.project.budget"],
+        "context": "Configures project structure and stages"
+      },
+      {
+        "area": "billing",
+        "questions": [
+          "Do you bill clients for project work?",
+          "How do you charge? (Fixed price, hourly/time & materials, milestone-based?)",
+          "Should timesheets automatically create billable invoice lines?",
+          "Do you need to track project profitability?"
+        ],
+        "config_fields": ["project.project.pricing_type", "sale.order.line.analytic", "project.profitability"],
+        "context": "Configures project billing and profitability tracking"
+      },
+      {
+        "area": "timesheets",
+        "questions": [
+          "How should employees log time on projects? (Daily, per task, per project?)",
+          "Do timesheets need manager approval before billing?",
+          "Should there be minimum hours logged per day or maximum per project?",
+          "Do you track time spent vs time estimated?"
+        ],
+        "config_fields": ["hr.timesheet.sheet", "account.analytic.line", "project.task.planned_hours"],
+        "context": "Configures timesheet entry and approval"
+      }
+    ]
+  },
+
+  "website_sale": {
+    "name": "E-Commerce / Online Store",
+    "description": "Online storefront, shopping cart, checkout",
+    "setup_areas": [
+      {
+        "area": "store_setup",
+        "questions": [
+          "What domain will your online store use?",
+          "Do you need multiple storefronts or languages?",
+          "Should customers create accounts or checkout as guests?",
+          "Do you need a customer portal where they can track orders?"
+        ],
+        "config_fields": ["website", "website.domain", "portal.user"],
+        "context": "Configures website and customer access"
+      },
+      {
+        "area": "product_display",
+        "questions": [
+          "How should products be organized? (Categories, collections, brands?)",
+          "Do you need product variants on the website? (Sizes, colors, options?)",
+          "Do you show products with zero stock? With 'notify when available'?",
+          "Do you need product comparisons or wishlists?"
+        ],
+        "config_fields": ["product.public.category", "product.template.website_published", "website.wishlist"],
+        "context": "Configures product catalog display"
+      },
+      {
+        "area": "checkout",
+        "questions": [
+          "What payment methods do you accept online? (Credit card, PayPal, bank transfer?)",
+          "Do you offer shipping options at checkout or flat rate?",
+          "Do you have promotional codes or coupons?",
+          "Do you need gift cards?"
+        ],
+        "config_fields": ["payment.provider", "delivery.carrier", "sale.coupon", "gift.card"],
+        "context": "Configures checkout and payment"
+      }
+    ]
+  }
+}
