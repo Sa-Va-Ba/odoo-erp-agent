@@ -466,9 +466,9 @@ HTML_TEMPLATE = """
         }
 
         .input-pill {
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; gap: 4px;
             background: var(--fill); border: 1px solid var(--border-strong);
-            border-radius: 100px; padding: 6px 6px 6px 18px;
+            border-radius: 100px; padding: 4px 4px 4px 18px;
             transition: border-color .15s, box-shadow .15s, background .15s;
         }
         .input-pill:focus-within {
@@ -692,6 +692,13 @@ HTML_TEMPLATE = """
             .sum-section { padding: 16px; }
             .prd-container { padding: 16px; }
         }
+        @media (max-width: 375px) {
+            /* Compact header for small phones (iPhone SE, older iPhones) */
+            .hd-pct { display: none; }
+            .hd-voice span { display: none; } /* hide "Voice" label, keep toggle */
+            .hd-row { gap: 8px; padding: 10px 12px; }
+            .hd-phase { gap: 7px; }
+        }
         @media (max-width: 360px) {
             .setup-headline { font-size: 28px; }
             .btn-cta { font-size: 15px; }
@@ -898,6 +905,19 @@ HTML_TEMPLATE = """
     }
     document.addEventListener('click',      _unlockAudio, { once: true, passive: true });
     document.addEventListener('touchstart', _unlockAudio, { once: true, passive: true });
+
+    // iOS keyboard handling — push input bar above software keyboard
+    // Uses visualViewport API (Safari 13+, Chrome 61+)
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+            const wrapper = document.querySelector('.chat-input-wrapper');
+            if (!wrapper) return;
+            const offset = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
+            wrapper.style.paddingBottom = offset > 0
+                ? (offset + 10) + 'px'
+                : 'calc(10px + env(safe-area-inset-bottom, 0px))';
+        });
+    }
 
     // Sync setup toggle → voiceEnabled state
     document.getElementById('voice-enabled').addEventListener('change', (e) => {
