@@ -10,14 +10,17 @@ Components:
 - VoiceInterviewAgent: Combines both for voice-based interviews
 """
 
-from .speech_to_text import SpeechToText, transcribe_audio_file
 from .text_to_speech import TextToSpeech, ELEVENLABS_VOICES
-from .voice_agent import VoiceInterviewAgent
 
-__all__ = [
-    "SpeechToText",
-    "TextToSpeech",
-    "ELEVENLABS_VOICES",
-    "VoiceInterviewAgent",
-    "transcribe_audio_file"
-]
+try:
+    from .speech_to_text import SpeechToText, transcribe_audio_file
+    from .voice_agent import VoiceInterviewAgent
+    __all__ = [
+        "SpeechToText",
+        "TextToSpeech",
+        "ELEVENLABS_VOICES",
+        "VoiceInterviewAgent",
+        "transcribe_audio_file"
+    ]
+except ImportError:
+    __all__ = ["TextToSpeech", "ELEVENLABS_VOICES"]
