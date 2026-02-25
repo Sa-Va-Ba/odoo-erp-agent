@@ -485,7 +485,7 @@ HTML_TEMPLATE = """
         .chat-input::placeholder { color: var(--text-3); }
 
         .mic-btn {
-            width: 38px; height: 38px; border-radius: 50%; border: none;
+            width: 44px; height: 44px; border-radius: 50%; border: none;
             background: transparent; color: var(--text-2); cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             transition: all .15s var(--ease); flex-shrink: 0;
@@ -502,7 +502,7 @@ HTML_TEMPLATE = """
         }
 
         .send-btn {
-            width: 38px; height: 38px; border-radius: 50%; border: none;
+            width: 44px; height: 44px; border-radius: 50%; border: none;
             background: var(--accent); cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             transition: all .15s var(--ease); flex-shrink: 0;
@@ -876,9 +876,28 @@ HTML_TEMPLATE = """
     let voiceEnabled = true;
     let speechSynthesis = window.speechSynthesis;
     let currentAudio = null;
+    let recognition = null;
 
     const hasMediaRecorder = !!window.MediaRecorder;
     const hasSpeechSynthesis = !!window.speechSynthesis;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const hasWebSpeech = !!SpeechRecognition;
+
+    // iOS/Safari audio unlock — must happen inside a user gesture
+    let _audioUnlocked = false;
+    function _unlockAudio() {
+        if (_audioUnlocked) return;
+        _audioUnlocked = true;
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const buf = ctx.createBuffer(1, 1, 22050);
+            const src = ctx.createBufferSource();
+            src.buffer = buf; src.connect(ctx.destination); src.start(0);
+            ctx.resume();
+        } catch(e) {}
+    }
+    document.addEventListener('click',      _unlockAudio, { once: true, passive: true });
+    document.addEventListener('touchstart', _unlockAudio, { once: true, passive: true });
 
     // Sync setup toggle → voiceEnabled state
     document.getElementById('voice-enabled').addEventListener('change', (e) => {
@@ -928,7 +947,7 @@ HTML_TEMPLATE = """
             return response.blob();
         })
         .then(blob => {
-            if (!blob || blob.type?.includes('json')) { hideVoiceStatus(); return; }
+            if (!blob || blob.type?.includes('json')) { hideVoiceStatus(); return speakBrowser(text); }
             return new Promise((resolve) => {
                 const url = URL.createObjectURL(blob);
                 const audio = new Audio(url);
@@ -959,38 +978,104 @@ HTML_TEMPLATE = """
         });
     }
 
-    async function startRecording() {
-        if (!hasMediaRecorder) {
-            alert('Voice recording is not supported in this browser. Please use Chrome or Safari.');
-            return;
-        }
+    function startRecording() {
         stopSpeaking();
+        _unlockAudio();
+        if (hasWebSpeech) {
+            _startWebSpeech();
+        } else if (hasMediaRecorder) {
+            _startMediaRecorder();
+        } else {
+            addMessage('system', 'Voice input not available in this browser — please type your answer.');
+        }
+    }
+
+    function _startWebSpeech() {
+        try {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = () => {
+                isRecording = true;
+                document.getElementById('mic-btn').classList.add('recording');
+                setVoiceStatus('listening', 'Listening… tap mic to stop');
+            };
+
+            // Show live interim transcript in the input box
+            recognition.onresult = (event) => {
+                let interim = '', final = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    (event.results[i].isFinal ? (final += event.results[i][0].transcript)
+                                              : (interim += event.results[i][0].transcript));
+                }
+                document.getElementById('user-input').value = final || interim;
+            };
+
+            recognition.onend = () => {
+                isRecording = false;
+                recognition = null;
+                document.getElementById('mic-btn').classList.remove('recording');
+                hideVoiceStatus();
+                const text = document.getElementById('user-input').value.trim();
+                if (text) sendMessage();
+            };
+
+            recognition.onerror = (event) => {
+                isRecording = false;
+                recognition = null;
+                document.getElementById('mic-btn').classList.remove('recording');
+                hideVoiceStatus();
+                if (event.error === 'not-allowed') {
+                    addMessage('system', 'Microphone access denied — please enable it in browser settings.');
+                } else if (event.error !== 'no-speech') {
+                    addMessage('system', "Couldn't catch that. Please try again or type your answer.");
+                }
+            };
+
+            recognition.start();
+        } catch (err) {
+            console.error('Web Speech error:', err);
+            // Fallback to MediaRecorder if Web Speech fails to start
+            _startMediaRecorder();
+        }
+    }
+
+    async function _startMediaRecorder() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
+            // Pick best supported MIME type (webm for Chrome, mp4 for iOS Safari)
+            const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
+                           : MediaRecorder.isTypeSupported('audio/mp4')  ? 'audio/mp4'
+                           : '';
+            mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
             audioChunks = [];
-            mediaRecorder.ondataavailable = (e) => { audioChunks.push(e.data); };
+            mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
             mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                await sendAudioToServer(audioBlob);
+                const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
                 stream.getTracks().forEach(track => track.stop());
+                await _sendAudioToServer(audioBlob);
             };
             mediaRecorder.start();
             isRecording = true;
             document.getElementById('mic-btn').classList.add('recording');
-            setVoiceStatus('listening', 'Listening… (tap mic to stop)');
+            setVoiceStatus('listening', 'Listening… tap mic to stop');
         } catch (err) {
             console.error('Microphone error:', err);
-            alert('Could not access microphone. Please check permissions.');
+            addMessage('system', 'Could not access microphone. Please check permissions or type your answer.');
         }
     }
 
     function stopRecording() {
-        if (mediaRecorder && isRecording) {
+        if (hasWebSpeech && recognition) {
+            recognition.stop(); // triggers onend → sendMessage
+        } else if (mediaRecorder && isRecording) {
             mediaRecorder.stop();
             isRecording = false;
             document.getElementById('mic-btn').classList.remove('recording');
-            setVoiceStatus('active', 'Processing...');
+            setVoiceStatus('active', 'Processing…');
         }
     }
 
@@ -998,7 +1083,7 @@ HTML_TEMPLATE = """
         if (isRecording) stopRecording(); else startRecording();
     }
 
-    async function sendAudioToServer(audioBlob) {
+    async function _sendAudioToServer(audioBlob) {
         try {
             const reader = new FileReader();
             reader.readAsDataURL(audioBlob);
@@ -1089,8 +1174,8 @@ HTML_TEMPLATE = """
             await speak(data.question);
             updateProgress(data.progress);
 
-            if (voiceEnabled && hasMediaRecorder) {
-                setTimeout(() => { if (!isRecording) startRecording(); }, 500);
+            if (voiceEnabled && (hasWebSpeech || hasMediaRecorder)) {
+                setTimeout(() => { if (!isRecording) startRecording(); }, 150);
             }
         } catch (error) {
             console.error('Error:', error);
