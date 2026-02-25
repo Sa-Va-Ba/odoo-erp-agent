@@ -1601,10 +1601,11 @@ def start_interview():
 
     session_id = secrets.token_hex(8)
 
+    _out = "/tmp" if os.environ.get("VERCEL") else "./outputs"
     agent = PhasedInterviewAgent(
         client_name=client_name,
         industry=industry,
-        output_dir="./outputs"
+        output_dir=_out
     )
 
     agents[session_id] = {
