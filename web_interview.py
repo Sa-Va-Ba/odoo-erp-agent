@@ -55,6 +55,20 @@ builds_lock = threading.Lock()
 # Last completed demo result (set by /api/generate-prd, read by /api/demo-result)
 last_demo_result = None
 
+# ── Pre-baked demo outcome (BelgiumParts NV — Manufacturing) ──────────────────
+# Generated from a full 37-question interview. Served at /api/demo-outcome and
+# auto-loaded when the app is opened with ?demo in the URL.
+import importlib.util as _ilu
+_DEMO_OUTCOME = None
+def _load_demo_outcome():
+    global _DEMO_OUTCOME
+    if _DEMO_OUTCOME is not None:
+        return _DEMO_OUTCOME
+    _p = Path(__file__).parent / "docs" / "demo_outcome.json"
+    if _p.exists():
+        _DEMO_OUTCOME = json.loads(_p.read_text())
+    return _DEMO_OUTCOME
+
 # Try to load whisper for server-side transcription
 try:
     from src.voice.speech_to_text import SpeechToText
@@ -1649,9 +1663,13 @@ HTML_TEMPLATE = """
     // ── Auto-load demo result if available ──
     (async function checkDemoResult() {
         try {
-            const r = await fetch('/api/demo-result');
+            // ?demo param → load pre-baked BelgiumParts NV outcome (works on Vercel)
+            const isDemo = new URLSearchParams(window.location.search).has('demo');
+            const endpoint = isDemo ? '/api/demo-outcome' : '/api/demo-result';
+            const r = await fetch(endpoint);
             const data = await r.json();
-            if (!data.available) return;
+            if (!isDemo && !data.available) return;
+            if (data.error) return;
 
             const summary = data.summary;
             const prd = data.prd;
@@ -1844,6 +1862,15 @@ def demo_result():
     if last_demo_result is None:
         return jsonify({'available': False})
     return jsonify({'available': True, **last_demo_result})
+
+
+@app.route('/api/demo-outcome', methods=['GET'])
+def demo_outcome():
+    """Return the pre-baked BelgiumParts NV interview outcome for instant demo."""
+    data = _load_demo_outcome()
+    if not data:
+        return jsonify({'error': 'Demo outcome not found'}), 404
+    return jsonify(data)
 
 
 @app.route('/api/transcribe', methods=['POST'])
