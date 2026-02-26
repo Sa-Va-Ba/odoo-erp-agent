@@ -1,0 +1,477 @@
+{
+  "company": {
+    "country": "US",
+    "currency": "EUR",
+    "fiscal_year_start_month": 1,
+    "industry": "Manufacturing",
+    "name": "BelgiumParts NV",
+    "tax_regime": "standard",
+    "timezone": "UTC"
+  },
+  "created_at": "2026-02-26T09:03:44.039317",
+  "data_imports": [
+    {
+      "entity_type": "customers",
+      "estimated_records": 0,
+      "notes": "Data type 'customer' mentioned alongside migration intent",
+      "priority": "medium",
+      "source": "csv"
+    },
+    {
+      "entity_type": "products",
+      "estimated_records": 0,
+      "notes": "Data type 'product' mentioned alongside migration intent",
+      "priority": "medium",
+      "source": "csv"
+    },
+    {
+      "entity_type": "vendors",
+      "estimated_records": 0,
+      "notes": "Data type 'supplier' mentioned alongside migration intent",
+      "priority": "medium",
+      "source": "csv"
+    },
+    {
+      "entity_type": "invoices",
+      "estimated_records": 0,
+      "notes": "Data type 'invoice' mentioned alongside migration intent",
+      "priority": "medium",
+      "source": "csv"
+    },
+    {
+      "entity_type": "employees",
+      "estimated_records": 0,
+      "notes": "Data type 'employee' mentioned alongside migration intent",
+      "priority": "medium",
+      "source": "csv"
+    },
+    {
+      "entity_type": "stock_levels",
+      "estimated_records": 0,
+      "notes": "Data type 'inventory' mentioned alongside migration intent",
+      "priority": "medium",
+      "source": "csv"
+    }
+  ],
+  "estimated_setup_minutes": 64,
+  "integrations": [
+    {
+      "direction": "bidirectional",
+      "integration_type": "file",
+      "notes": "Mentioned during scoping: Our main pain points are: inventory tracking across two warehouses is done in Excel, production sche",
+      "priority": "medium",
+      "system_name": "Excel/CSV"
+    },
+    {
+      "direction": "import",
+      "integration_type": "file",
+      "notes": "Mentioned during scoping: Our main pain points are: inventory tracking across two warehouses is done in Excel, production sche",
+      "priority": "medium",
+      "system_name": "Spreadsheets"
+    },
+    {
+      "direction": "bidirectional",
+      "integration_type": "api",
+      "notes": "Mentioned during scoping: A customer sends an RFQ, our sales team creates a quotation in Word, once confirmed they email manuf",
+      "priority": "medium",
+      "system_name": "DHL"
+    },
+    {
+      "direction": "import",
+      "integration_type": "file",
+      "notes": "Mentioned during scoping: Standard 30-day payment terms. We accept bank transfer and occasionally credit card for smaller orde",
+      "priority": "medium",
+      "system_name": "Banking"
+    }
+  ],
+  "interview_session_id": "unknown",
+  "interview_summary": {
+    "_completeness_score": 1.0,
+    "_warnings": [],
+    "client_name": "BelgiumParts NV",
+    "detected_signals": {
+      "finance": 29,
+      "hr": 14,
+      "inventory": 25,
+      "manufacturing": 35,
+      "purchase": 19,
+      "sales": 35
+    },
+    "domain_responses": {
+      "finance": [
+        {
+          "a": "About 30 active users: 6 in sales, 4 in accounting, 3 managers, 14 on the factory floor, 3 warehouse staff.",
+          "q": "Which countries do you operate in financially? (This affects tax rules and legal invoice formats)"
+        },
+        {
+          "a": "We use a basic CRM spreadsheet for leads. Win rate is around 35%. Average deal size is \u20ac18,000.",
+          "q": "What tax rates do you charge? Does it vary by product type or customer location?"
+        },
+        {
+          "a": "Standard 30-day payment terms. We accept bank transfer and occasionally credit card for smaller orders.",
+          "q": "What are your payment terms? (Net 30, Due on receipt, installments, etc.)"
+        },
+        {
+          "a": "Two warehouses (Ghent and Antwerp). Tracked in Excel. Monthly manual counts. FIFO costing. Raw material lead time is 2-5 weeks from European suppliers.",
+          "q": "How do you currently track what's been paid vs. what's outstanding?"
+        },
+        {
+          "a": "Currently no reorder rules \u2014 we run out of stock roughly 4 times per year which causes production delays.",
+          "q": "Do you need separate reporting by department, project, or business unit?"
+        }
+      ],
+      "hr": [
+        {
+          "a": "Our main pain points are: inventory tracking across two warehouses is done in Excel, production scheduling is manual, purchase orders are emailed manually to suppliers, and our accounting team spends 2 days per month reconciling spreadsheets. We also have no CRM \u2014 leads are tracked in a shared inbox.",
+          "q": "What's your company structure? Departments, teams, reporting lines?"
+        },
+        {
+          "a": "A customer sends an RFQ, our sales team creates a quotation in Word, once confirmed they email manufacturing. Manufacturing creates a production order based on a bill of materials, we source raw materials from 6 main suppliers, produce the parts, do quality inspection, then ship via DHL freight. Invoicing is done on delivery. Payment terms are net-30.",
+          "q": "How do employees request time off? What types of leave do you offer?"
+        },
+        {
+          "a": "About 30 active users: 6 in sales, 4 in accounting, 3 managers, 14 on the factory floor, 3 warehouse staff.",
+          "q": "Do you track attendance? How do people clock in/out?"
+        },
+        {
+          "a": "We use a basic CRM spreadsheet for leads. Win rate is around 35%. Average deal size is \u20ac18,000.",
+          "q": "Do employees submit expenses for reimbursement?"
+        }
+      ],
+      "inventory": [
+        {
+          "a": "We can configure that during the implementation phase.",
+          "q": "Describe your warehouse setup: How many locations? Do you have zones, aisles, shelves, bins?"
+        },
+        {
+          "a": "No strong preference, we are open to best practice recommendations.",
+          "q": "Do any of your products need serial numbers or batch/lot tracking? (e.g., for recalls, expiration, warranties)"
+        },
+        {
+          "a": "We are a manufacturing company called BelgiumParts NV, making precision metal components for the automotive industry. We have 95 employees across two sites in Ghent and Antwerp.",
+          "q": "How do you know when to reorder? Do you have minimum stock levels set up?"
+        },
+        {
+          "a": "Our main pain points are: inventory tracking across two warehouses is done in Excel, production scheduling is manual, purchase orders are emailed manually to suppliers, and our accounting team spends 2 days per month reconciling spreadsheets. We also have no CRM \u2014 leads are tracked in a shared inbox.",
+          "q": "When an order comes in, how do your warehouse staff know what to pick and ship?"
+        },
+        {
+          "a": "A customer sends an RFQ, our sales team creates a quotation in Word, once confirmed they email manufacturing. Manufacturing creates a production order based on a bill of materials, we source raw materials from 6 main suppliers, produce the parts, do quality inspection, then ship via DHL freight. Invoicing is done on delivery. Payment terms are net-30.",
+          "q": "Do you use barcode scanners? Or plan to?"
+        }
+      ],
+      "manufacturing": [
+        {
+          "a": "80 employees on payroll, 15 contractors. We need leave management, basic HR records, and an org chart.",
+          "q": "Walk me through making one of your products: What raw materials go in, what comes out?"
+        },
+        {
+          "a": "Yes, that applies to us.",
+          "q": "What machines or workstations are involved? Do they have capacity limits?"
+        },
+        {
+          "a": "We can configure that during the implementation phase.",
+          "q": "Is there a specific sequence of steps (routing) to make your products?"
+        },
+        {
+          "a": "No strong preference, we are open to best practice recommendations.",
+          "q": "Do you make to stock (in advance) or make to order (when customer orders)?"
+        },
+        {
+          "a": "We are a manufacturing company called BelgiumParts NV, making precision metal components for the automotive industry. We have 95 employees across two sites in Ghent and Antwerp.",
+          "q": "How do you track production time? Do workers clock in/out of jobs?"
+        }
+      ],
+      "purchase": [
+        {
+          "a": "Accounting is in an old on-premise system. We need EUR as primary currency. 21% Belgian VAT. Fiscal year ends December 31.",
+          "q": "How many suppliers do you regularly buy from? Do you have preferred vendors for specific products?"
+        },
+        {
+          "a": "We invoice on delivery. About 300 invoices per month. Bank reconciliation is very manual.",
+          "q": "Do purchase orders need approval? At what amount threshold?"
+        },
+        {
+          "a": "We have bills of materials for about 120 product variants. Work centres are CNC milling, turning, and assembly. Production lead time is 3-5 days.",
+          "q": "Do you negotiate pricing or contracts with suppliers in advance?"
+        },
+        {
+          "a": "6 main suppliers, all European. We want automatic reorder points and 3-quote comparison for orders above \u20ac5,000.",
+          "q": "When goods arrive, what's your receiving process? Do you inspect quality?"
+        }
+      ],
+      "sales": [
+        {
+          "a": "We invoice on delivery. About 300 invoices per month. Bank reconciliation is very manual.",
+          "q": "Walk me through your sales process: How does someone go from 'interested' to 'paying customer'?"
+        },
+        {
+          "a": "We have bills of materials for about 120 product variants. Work centres are CNC milling, turning, and assembly. Production lead time is 3-5 days.",
+          "q": "How do you price your products? Do you have standard prices, or does it vary by customer, quantity, or region?"
+        },
+        {
+          "a": "6 main suppliers, all European. We want automatic reorder points and 3-quote comparison for orders above \u20ac5,000.",
+          "q": "Do your salespeople give discounts? If so, are there limits or do they need approval?"
+        },
+        {
+          "a": "80 employees on payroll, 15 contractors. We need leave management, basic HR records, and an org chart.",
+          "q": "Do you send quotes/proposals to customers? What needs to be on them?"
+        },
+        {
+          "a": "Yes, that applies to us.",
+          "q": "How do you track where leads come from? (Website, referrals, ads, trade shows, etc.)"
+        }
+      ]
+    },
+    "domains_covered": [
+      "sales",
+      "inventory",
+      "finance",
+      "purchase",
+      "manufacturing",
+      "hr"
+    ],
+    "industry": "Manufacturing",
+    "llm_available": true,
+    "mentioned_topics": {
+      "multi_warehouse": "Our main pain points are: inventory tracking across two warehouses is done in Excel, production sche",
+      "payroll": "80 employees on payroll, 15 contractors. We need leave management, basic HR records, and an org char"
+    },
+    "phase": "summary",
+    "progress": {
+      "current_domain": null,
+      "domains_completed": [
+        "sales",
+        "inventory",
+        "finance",
+        "purchase",
+        "manufacturing",
+        "hr"
+      ],
+      "domains_pending": [],
+      "overall_percent": 100,
+      "phase": "Summary",
+      "phase_progress": 1,
+      "phase_total": 1
+    },
+    "questions_answered": 37,
+    "questions_asked": 37,
+    "recommended_modules": [
+      "stock",
+      "hr",
+      "sale_management",
+      "hr_attendance",
+      "hr_holidays",
+      "mrp_workorder",
+      "mrp",
+      "delivery",
+      "purchase",
+      "account",
+      "account_followup",
+      "crm"
+    ],
+    "scoping_responses": [
+      {
+        "a": "We are a manufacturing company called BelgiumParts NV, making precision metal components for the automotive industry. We have 95 employees across two sites in Ghent and Antwerp.",
+        "q": "What products or services do you sell, and how do customers typically buy from you? (e.g., 'B2B quotes via sales reps', 'online store', 'contracts and renewals')"
+      },
+      {
+        "a": "Our main pain points are: inventory tracking across two warehouses is done in Excel, production scheduling is manual, purchase orders are emailed manually to suppliers, and our accounting team spends 2 days per month reconciling spreadsheets. We also have no CRM \u2014 leads are tracked in a shared inbox.",
+        "q": "Do you handle physical goods \u2014 warehousing, shipping, or inventory tracking?"
+      },
+      {
+        "a": "A customer sends an RFQ, our sales team creates a quotation in Word, once confirmed they email manufacturing. Manufacturing creates a production order based on a bill of materials, we source raw materials from 6 main suppliers, produce the parts, do quality inspection, then ship via DHL freight. Invoicing is done on delivery. Payment terms are net-30.",
+        "q": "Do you manufacture, assemble, or transform raw materials into finished products?"
+      },
+      {
+        "a": "About 30 active users: 6 in sales, 4 in accounting, 3 managers, 14 on the factory floor, 3 warehouse staff.",
+        "q": "How do you handle purchasing from suppliers? Do you use purchase orders, blanket contracts, or something informal?"
+      },
+      {
+        "a": "We use a basic CRM spreadsheet for leads. Win rate is around 35%. Average deal size is \u20ac18,000.",
+        "q": "Do you track projects, timesheets, or bill clients on time & materials?"
+      },
+      {
+        "a": "Standard 30-day payment terms. We accept bank transfer and occasionally credit card for smaller orders.",
+        "q": "How do you handle invoicing and accounting today? Do you deal with multi-currency, multiple tax rates, or specific fiscal requirements?"
+      },
+      {
+        "a": "Two warehouses (Ghent and Antwerp). Tracked in Excel. Monthly manual counts. FIFO costing. Raw material lead time is 2-5 weeks from European suppliers.",
+        "q": "How many employees do you have? Do you need to manage leave requests, attendance, payroll, or expense claims in Odoo?"
+      },
+      {
+        "a": "Currently no reorder rules \u2014 we run out of stock roughly 4 times per year which causes production delays.",
+        "q": "Do you sell online or need a website? What platform are you using today, if any?"
+      },
+      {
+        "a": "Accounting is in an old on-premise system. We need EUR as primary currency. 21% Belgian VAT. Fiscal year ends December 31.",
+        "q": "What existing software or systems need to connect to Odoo? (e.g., Shopify, QuickBooks, Stripe, spreadsheets, custom APIs)"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "depends_on": [],
+      "display_name": "Sales",
+      "estimated_minutes": 5,
+      "install": true,
+      "module_name": "sale_management",
+      "notes": "Detected from sales domain interview",
+      "priority": "high",
+      "settings": {
+        "group_discount_per_so_line": false,
+        "group_sale_pricelist": false
+      }
+    },
+    {
+      "depends_on": [],
+      "display_name": "Inventory",
+      "estimated_minutes": 8,
+      "install": true,
+      "module_name": "stock",
+      "notes": "Detected from inventory domain interview",
+      "priority": "high",
+      "settings": {
+        "group_stock_multi_locations": true,
+        "group_stock_tracking_lot": true
+      }
+    },
+    {
+      "depends_on": [],
+      "display_name": "Invoicing/Accounting",
+      "estimated_minutes": 10,
+      "install": true,
+      "module_name": "account",
+      "notes": "Detected from finance domain interview",
+      "priority": "critical",
+      "settings": {
+        "group_analytic_accounting": false
+      }
+    },
+    {
+      "depends_on": [
+        "stock"
+      ],
+      "display_name": "Purchase",
+      "estimated_minutes": 5,
+      "install": true,
+      "module_name": "purchase",
+      "notes": "Detected from purchase domain interview",
+      "priority": "medium",
+      "settings": {}
+    },
+    {
+      "depends_on": [
+        "stock"
+      ],
+      "display_name": "Manufacturing",
+      "estimated_minutes": 10,
+      "install": true,
+      "module_name": "mrp",
+      "notes": "Detected from manufacturing domain interview",
+      "priority": "medium",
+      "settings": {}
+    },
+    {
+      "depends_on": [],
+      "display_name": "Employees",
+      "estimated_minutes": 5,
+      "install": true,
+      "module_name": "hr",
+      "notes": "Detected from hr domain interview",
+      "priority": "medium",
+      "settings": {}
+    },
+    {
+      "depends_on": [
+        "hr"
+      ],
+      "display_name": "Attendance",
+      "estimated_minutes": 3,
+      "install": true,
+      "module_name": "hr_attendance",
+      "notes": "Recommended based on interview analysis",
+      "priority": "low",
+      "settings": {}
+    },
+    {
+      "depends_on": [
+        "hr"
+      ],
+      "display_name": "Time Off",
+      "estimated_minutes": 3,
+      "install": true,
+      "module_name": "hr_holidays",
+      "notes": "Recommended based on interview analysis",
+      "priority": "low",
+      "settings": {}
+    },
+    {
+      "depends_on": [
+        "sale_management"
+      ],
+      "display_name": "CRM",
+      "estimated_minutes": 5,
+      "install": true,
+      "module_name": "crm",
+      "notes": "Recommended based on interview analysis",
+      "priority": "high",
+      "settings": {
+        "group_use_lead": true
+      }
+    }
+  ],
+  "pain_points": [
+    "Our main pain points are: inventory tracking across two warehouses is done in Excel, production scheduling is manual, purchase orders are emailed manually to suppliers, and our accounting team spends 2 days per month reconciling spreadsheets. We also have no CRM \u2014 leads are tracked in a shared inbox.",
+    "We use a basic CRM spreadsheet for leads. Win rate is around 35%. Average deal size is \u20ac18,000.",
+    "Two warehouses (Ghent and Antwerp). Tracked in Excel. Monthly manual counts. FIFO costing. Raw material lead time is 2-5 weeks from European suppliers.",
+    "We invoice on delivery. About 300 invoices per month. Bank reconciliation is very manual."
+  ],
+  "spec_id": "spec-227f66fe",
+  "special_requirements": [],
+  "user_roles": [
+    {
+      "count": 1,
+      "description": "Full system access",
+      "groups": [
+        "base.group_system"
+      ],
+      "name": "Administrator"
+    },
+    {
+      "count": 1,
+      "description": "Sales team member with CRM and quotation access",
+      "groups": [
+        "sale.group_sale_salesman",
+        "base.group_user"
+      ],
+      "name": "Sales User"
+    },
+    {
+      "count": 1,
+      "description": "Warehouse staff with stock and picking access",
+      "groups": [
+        "stock.group_stock_user",
+        "base.group_user"
+      ],
+      "name": "Warehouse User"
+    },
+    {
+      "count": 1,
+      "description": "Accounting and invoicing access",
+      "groups": [
+        "account.group_account_user",
+        "base.group_user"
+      ],
+      "name": "Accountant"
+    },
+    {
+      "count": 1,
+      "description": "Department manager with approval rights",
+      "groups": [
+        "base.group_user"
+      ],
+      "name": "Manager"
+    }
+  ]
+}
