@@ -32,11 +32,10 @@ class RailwayAPIError(Exception):
 class RailwayClient:
     """Thin wrapper around Railway's GraphQL API using only stdlib."""
 
-    # Prefer api.railway.app (less likely to be blocked by Cloudflare browser rules),
-    # then fall back to backboard.railway.com for compatibility.
+    # Primary documented endpoint. api.railway.app is kept as fallback only.
     DEFAULT_API_URLS = (
-        "https://api.railway.app/graphql/v2",
         "https://backboard.railway.com/graphql/v2",
+        "https://api.railway.app/graphql/v2",
     )
 
     def __init__(self, token: str, api_urls: Optional[list[str] | tuple[str, ...]] = None):
@@ -138,35 +137,45 @@ class RailwayClient:
         env_id = project["environments"]["edges"][0]["node"]["id"]
         return project_id, env_id
 
-    def create_service(self, project_id: str, name: str) -> str:
-        """Create a service in a project. Returns service_id."""
-        query = """
-        mutation($projectId: String!, $name: String!) {
-            serviceCreate(input: { projectId: $projectId, name: $name }) {
-                id
+    def create_service(self, project_id: str, name: str, image: Optional[str] = None) -> str:
+        """Create a service in a project, optionally with a Docker image. Returns service_id."""
+        if image:
+            query = """
+            mutation($projectId: String!, $name: String!, $image: String!) {
+                serviceCreate(input: { projectId: $projectId, name: $name, source: { image: $image } }) {
+                    id
+                }
             }
-        }
-        """
-        data = self._request(query, {"projectId": project_id, "name": name})
+            """
+            data = self._request(query, {"projectId": project_id, "name": name, "image": image})
+        else:
+            query = """
+            mutation($projectId: String!, $name: String!) {
+                serviceCreate(input: { projectId: $projectId, name: $name }) {
+                    id
+                }
+            }
+            """
+            data = self._request(query, {"projectId": project_id, "name": name})
         return data["serviceCreate"]["id"]
 
-    def set_service_source(self, service_id: str, image: str) -> None:
-        """Set a Docker image as the service source."""
+    def set_service_start_command(self, service_id: str, env_id: str, start_command: str) -> None:
+        """Set a custom start command on a service instance (environmentId required)."""
         query = """
-        mutation($serviceId: String!, $image: String!) {
-            serviceInstanceUpdate(serviceId: $serviceId, input: { source: { image: $image } })
+        mutation($serviceId: String!, $environmentId: String!, $startCommand: String!) {
+            serviceInstanceUpdate(serviceId: $serviceId, environmentId: $environmentId, input: { startCommand: $startCommand })
         }
         """
-        self._request(query, {"serviceId": service_id, "image": image})
+        self._request(query, {"serviceId": service_id, "environmentId": env_id, "startCommand": start_command})
 
-    def set_service_start_command(self, service_id: str, start_command: str) -> None:
-        """Set a custom start command on a service."""
+    def deploy_service(self, service_id: str, env_id: str) -> None:
+        """Trigger a deployment for a service instance."""
         query = """
-        mutation($serviceId: String!, $startCommand: String!) {
-            serviceInstanceUpdate(serviceId: $serviceId, input: { startCommand: $startCommand })
+        mutation($serviceId: String!, $environmentId: String!) {
+            serviceInstanceDeployV2(serviceId: $serviceId, environmentId: $environmentId)
         }
         """
-        self._request(query, {"serviceId": service_id, "startCommand": start_command})
+        self._request(query, {"serviceId": service_id, "environmentId": env_id})
 
     def set_service_variables(
         self, project_id: str, env_id: str, service_id: str, variables: dict[str, str]
@@ -251,7 +260,8 @@ class RailwayOdooBuilder:
             spec_id=spec.spec_id,
             deploy_target="railway",
         )
-        self.state.admin_password = secrets.token_urlsafe(12)
+        # Keep admin_password = "admin" (BuildState default) so XML-RPC login
+        # matches Odoo's default admin user password after fresh --init base.
 
         self.on_progress: Optional[Callable[[BuildState], None]] = None
         self._stop_event = threading.Event()
@@ -345,62 +355,76 @@ class RailwayOdooBuilder:
         project_name = f"odoo-{company_name_safe}"
 
         try:
-            # Create project
+            # 1. Create project
             self._log(task, f"Creating Railway project: {project_name}")
             self._project_id, self._env_id = self.railway.create_project(project_name)
-            task.progress = 15
+            task.progress = 10
             self._notify_progress()
 
-            # Create Postgres service
+            # 2. Create Postgres service with image source in one call
             self._log(task, "Creating PostgreSQL 15 service...")
-            pg_service_id = self.railway.create_service(self._project_id, "Postgres")
-            self.railway.set_service_source(pg_service_id, "postgres:15")
+            pg_service_id = self.railway.create_service(self._project_id, "Postgres", "postgres:15")
             self.railway.set_service_variables(
                 self._project_id, self._env_id, pg_service_id,
                 {
                     "POSTGRES_USER": "odoo",
                     "POSTGRES_PASSWORD": db_password,
-                    "POSTGRES_DB": "postgres",
+                    "POSTGRES_DB": "odoo",
                     "PGDATA": "/var/lib/postgresql/data/pgdata",
                 },
             )
-            task.progress = 40
+            task.progress = 25
             self._notify_progress()
 
-            # Create Odoo service
+            # 3. Deploy Postgres
+            self._log(task, "Deploying PostgreSQL 15...")
+            self.railway.deploy_service(pg_service_id, self._env_id)
+            task.progress = 35
+            self._notify_progress()
+
+            # 4. Create Odoo service with image source in one call
             self._log(task, "Creating Odoo 17 service...")
-            self._odoo_service_id = self.railway.create_service(self._project_id, "Odoo")
-            self.railway.set_service_source(self._odoo_service_id, "odoo:17.0")
+            self._odoo_service_id = self.railway.create_service(self._project_id, "Odoo", "odoo:17.0")
             self.railway.set_service_variables(
                 self._project_id, self._env_id, self._odoo_service_id,
                 {
-                    # Postgres connection (Railway internal networking)
-                    "HOST": "${{Postgres.RAILWAY_PRIVATE_DOMAIN}}",
+                    # Railway private networking: service hostname = {name}.railway.internal
+                    "HOST": "postgres.railway.internal",
                     "USER": "odoo",
                     "PASSWORD": db_password,
+                    "PGPASSWORD": db_password,
                 },
             )
-            # Start command: auto-init DB on first boot
-            self._log(task, "Setting Odoo start command (--init base)...")
+            # Set start command – environmentId is required by Railway's serviceInstanceUpdate
+            self._log(task, "Configuring Odoo start command (--init base)...")
             self.railway.set_service_start_command(
                 self._odoo_service_id,
-                "odoo --database odoo --init base --db_host $HOST --db_port 5432 "
-                f"--db_user odoo --db_password {db_password} --without-demo=all",
+                self._env_id,
+                "odoo --database odoo --init base"
+                " --db_host postgres.railway.internal --db_port 5432"
+                f" --db_user odoo --db_password {db_password} --without-demo=all",
             )
-            task.progress = 65
+            task.progress = 55
             self._notify_progress()
 
-            # Create public domain
+            # 5. Create public domain before deploy so URL is ready
             self._log(task, "Creating public domain...")
             self._domain = self.railway.create_service_domain(
                 self._odoo_service_id, self._env_id
             )
             domain = self._domain.strip()
             self.state.odoo_url = domain if domain.startswith("http") else f"https://{domain}"
-            task.progress = 80
+            task.progress = 70
             self._notify_progress()
 
-            self._log(task, f"Railway project created! URL: {self.state.odoo_url}")
+            # 6. Deploy Odoo
+            self._log(task, "Deploying Odoo 17...")
+            self.railway.deploy_service(self._odoo_service_id, self._env_id)
+            task.progress = 85
+            self._notify_progress()
+
+            self._log(task, f"Railway project ready! URL: {self.state.odoo_url}")
+            self._log(task, "Postgres + Odoo are booting — DB init takes 3-5 min...")
             task.progress = 100
             task.status = TaskStatus.COMPLETED
 

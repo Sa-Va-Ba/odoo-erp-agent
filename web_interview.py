@@ -860,6 +860,12 @@ HTML_TEMPLATE = """
                     <option value="railway" selected>Railway Cloud</option>
                 </select>
             </div>
+            <div class="deploy-row" id="railway-token-row" style="display:none;">
+                <label style="font-size:14px;font-weight:600;color:var(--text-2);white-space:nowrap;">Railway token</label>
+                <input id="railway-token" type="password" class="deploy-select"
+                    placeholder="Paste your Railway API token (railway.app/account/tokens)"
+                    style="flex:1;font-size:14px;" autocomplete="off">
+            </div>
             <button class="btn-sum success" id="btn-deploy" onclick="startDeploy()" style="display:none;">Deploy to Odoo</button>
             <button class="btn-sum primary" id="btn-download-md" onclick="downloadPrdMarkdown()" style="display:none;">Download PRD (Markdown)</button>
             <button class="btn-sum muted" id="btn-download-json" onclick="downloadPrdJson()" style="display:none;">Download PRD (JSON)</button>
@@ -1485,8 +1491,11 @@ HTML_TEMPLATE = """
     function updateDeployButton() {
         const sel = document.getElementById('deploy-target');
         const btn = document.getElementById('btn-deploy');
+        const tokenRow = document.getElementById('railway-token-row');
         if (!btn || !sel) return;
-        btn.textContent = sel.value === 'railway' ? 'Deploy to Railway' : 'Deploy to Docker';
+        const isRailway = sel.value === 'railway';
+        btn.textContent = isRailway ? 'Deploy to Railway' : 'Deploy to Docker';
+        if (tokenRow) tokenRow.style.display = isRailway ? 'flex' : 'none';
     }
 
     async function startDeploy() {
@@ -1509,10 +1518,16 @@ HTML_TEMPLATE = """
 
         try {
             const deployTarget = document.getElementById('deploy-target')?.value || 'docker';
+            const railwayToken = (document.getElementById('railway-token')?.value || '').trim();
+            if (deployTarget === 'railway' && !railwayToken) {
+                throw new Error('Please enter your Railway API token. Get one at railway.app/account/tokens');
+            }
+            const payload = { spec: prdJson, deploy_target: deployTarget };
+            if (railwayToken) payload.railway_token = railwayToken;
             const response = await fetch('/api/build/start', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ spec: prdJson, deploy_target: deployTarget })
+                body: JSON.stringify(payload)
             });
             if (!response.ok) {
                 let errorMsg = 'Failed to start build (HTTP ' + response.status + ')';
@@ -2023,12 +2038,13 @@ def build_start():
 
         if deploy_target == 'railway':
             from src.builders.railway_builder import RailwayOdooBuilder
-            railway_token = os.environ.get('RAILWAY_API_TOKEN', '')
+            # Accept token from request body first, fall back to env var
+            railway_token = (data.get('railway_token') or '').strip() or os.environ.get('RAILWAY_API_TOKEN', '')
             if not railway_token:
                 return jsonify({
                     'error': (
-                        'RAILWAY_API_TOKEN not set. Add it to your .env file or environment. '
-                        'Get a token at https://railway.app/account/tokens'
+                        'Railway API token required. Enter it in the token field above '
+                        '(get one at railway.app/account/tokens).'
                     )
                 }), 400
             builder = RailwayOdooBuilder(spec, railway_token)
